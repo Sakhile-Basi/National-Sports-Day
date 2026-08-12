@@ -3,6 +3,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
 
+const wristbandStyles = {
+  both: 'bg-red-500 text-white',
+  sports: 'bg-green-500 text-gray-950',
+  party: 'bg-blue-500 text-white',
+}
+
+const wristbandLabels = {
+  both: 'Red',
+  sports: 'Green',
+  party: 'Blue',
+}
+
 export default function ScanPage() {
   const [result, setResult] = useState(null)
   const [scanning, setScanning] = useState(false)
@@ -95,6 +107,11 @@ export default function ScanPage() {
               <div className="bg-white/10 rounded-xl p-4 w-full">
                 <p className="text-xl font-semibold">{result.ticket.attendee_name}</p>
                 <p className="text-gray-300 text-sm">{result.ticket.email}</p>
+                {result.valid && (
+                  <div className={`mt-3 rounded-lg py-2 font-bold uppercase tracking-wide ${wristbandStyles[result.ticket.pass_type]}`}>
+                    {wristbandLabels[result.ticket.pass_type]} wristband
+                  </div>
+                )}
               </div>
             )}
             <button

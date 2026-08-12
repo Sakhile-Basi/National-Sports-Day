@@ -6,6 +6,7 @@ import QRCode from 'qrcode'
 export default function GeneratePage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [passType, setPassType] = useState('both')
   const [ticket, setTicket] = useState(null)
   const [qrDataUrl, setQrDataUrl] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -20,7 +21,7 @@ export default function GeneratePage() {
     const res = await fetch('/api/tickets/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ attendee_name: name, email }),
+      body: JSON.stringify({ attendee_name: name, email, pass_type: passType }),
     })
 
     const data = await res.json()
@@ -47,6 +48,7 @@ export default function GeneratePage() {
   const handleReset = () => {
     setName('')
     setEmail('')
+    setPassType('both')
     setTicket(null)
     setQrDataUrl(null)
     setError(null)
@@ -78,6 +80,18 @@ export default function GeneratePage() {
                 placeholder="e.g. example@email.com or 082..."
                 className="w-full bg-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
+            </div>
+            <div>
+              <label className="text-sm text-gray-400 mb-1 block">Pass Type *</label>
+              <select
+                value={passType}
+                onChange={e => setPassType(e.target.value)}
+                className="w-full bg-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="both">Sports Day + After-Party (Red)</option>
+                <option value="sports">Sports Day Only (Green)</option>
+                <option value="party">After-Party Only (Blue)</option>
+              </select>
             </div>
 
             {error && <p className="text-red-400 text-sm">{error}</p>}
