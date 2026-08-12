@@ -1,14 +1,15 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { getSessionUser } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
 export async function POST(request) {
-  const user = await getSessionUser()
-  if (!user || user.role !== 'admin') {
-    return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+  const { attendee_name, email, pass_type } = await request.json()
+
+  if (!attendee_name || !email || !['sports', 'party', 'both'].includes(pass_type)) {
+    return NextResponse.json({ error: 'Missing or invalid fields' }, { status: 400 })
   }
 
-  const { attendee_name, email, pass_type } = await request.json()
+  // TODO: verify Cloudflare Turnstile token here before inserting
+
   const ticket_code = crypto.randomUUID()
 
   const { data, error } = await supabaseAdmin
@@ -18,6 +19,9 @@ export async function POST(request) {
     .single()
 
   if (error) {
+    if (error.code === '23505') { // unique violation
+      return NextResponse.json({ error: 'This email is already registered' }, { status: 409 })
+    }
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 

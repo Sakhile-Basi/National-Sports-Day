@@ -2,30 +2,29 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleLogin = async () => {
-    if (!name.trim()) return setError('Please enter your name')
-    if (!password.trim()) return setError('Please enter the password')
+    if (!email.trim()) return setError('Please enter your email')
+    if (!password.trim()) return setError('Please enter your password')
     setLoading(true)
     setError(null)
 
-    const res = await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password, name }),
-    })
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (res.ok) {
+    if (!signInError) {
       router.push('/admin/dashboard')
+      router.refresh()
     } else {
-      setError('Incorrect password')
+      setError('Incorrect email or password')
       setLoading(false)
     }
   }
@@ -38,19 +37,19 @@ export default function LoginPage() {
     <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-8">
       <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-8 shadow-xl flex flex-col gap-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Admin Access</h1>
-          <p className="text-gray-400 text-sm mt-1">Enter your details to continue</p>
+          <h1 className="text-2xl font-bold">Staff Access</h1>
+          <p className="text-gray-400 text-sm mt-1">Sign in to continue</p>
         </div>
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Your Name</label>
+            <label className="text-sm text-gray-400 mb-1 block">Email</label>
             <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="e.g. Sakhile"
+              placeholder="you@school.ac.za"
               className="w-full bg-gray-800 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>

@@ -1,16 +1,37 @@
 import { NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
-export function proxy(request) {
-  const authCookie = request.cookies.get('admin_auth')
-  const isLoginPage = request.nextUrl.pathname === '/admin/login'
+export async function proxy(request) {
+  const { pathname } = request.nextUrl
+  const isLoginPage = pathname === '/admin/login'
 
-  if (!authCookie && !isLoginPage) {
+  let response = NextResponse.next()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll() },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user && !isLoginPage) {
     return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/scan'], // /register is deliberately NOT listed — public
 }
