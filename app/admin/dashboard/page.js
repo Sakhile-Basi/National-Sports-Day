@@ -30,8 +30,9 @@ export default function DashboardPage() {
       .from('tickets')
       .select('*')
       .order('created_at', { ascending: false })
-     setTickets(data || [])
-     setLoading(false)
+    if (error) console.error('Dashboard fetch error:', error.message)
+    setTickets(data || [])
+    setLoading(false)
   }
 
   const total = tickets.length
