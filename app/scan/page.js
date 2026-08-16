@@ -118,7 +118,7 @@ export default function ScanPage() {
               onClick={handleReset}
               className="w-full bg-white text-gray-900 hover:bg-gray-100 rounded-xl py-3 font-semibold transition-colors"
             >
-              Scan Next <a href="/admin/dashboard" className="w-full text-center text-gray-400 text-sm underline">Back to Dashboard</a>
+              Scan Next <a href="/admin/dashboard" className="w-full text-center text-gray-800 text-sm underline">Back to Dashboard</a>
             </button>
           </div>
         )}
