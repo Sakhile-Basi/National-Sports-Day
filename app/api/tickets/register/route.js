@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { NextResponse } from 'next/server'
 
-const TICKET_CAP = 1
+const TICKET_CAP = 1000
 
 export async function POST(request) {
   const { attendee_name, email, pass_type, turnstile_token } = await request.json()

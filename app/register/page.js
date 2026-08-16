@@ -25,7 +25,28 @@ export default function RegisterPage() {
     return () => { delete window.onTurnstileSuccess }
   }, [])
 
+  const [ticketCount, setTicketCount] = useState(null)
+  useEffect(() => {
+    fetch('/api/tickets/count')
+      .then(res => res.json())
+      .then(data => setTicketCount(data.count))
+      .catch(() => {})
+  }, [])
+
+  const [isFull, setIsFull] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/tickets/count')
+      .then(res => res.json())
+      .then(data => {
+        setTicketCount(data.count)
+        if (data.count >= 1000) setIsFull(true)
+      })
+      .catch(() => {})
+  }, [])
+
   const handleRegister = async () => {
+    
     if (!name.trim()) return setError('Please enter your full name')
     if (!email.trim()) return setError('Please enter your email')
     if (!turnstileToken) return setError('Please complete the verification check')
@@ -41,7 +62,11 @@ export default function RegisterPage() {
     const data = await res.json()
 
     if (!res.ok) {
-      setError(data.error || 'Something went wrong, please try again')
+      if (res.status === 409 && data.error?.includes('full')) {
+        setIsFull(true)
+      } else {
+        setError(data.error || 'Something went wrong, please try again')
+      }
       setLoading(false)
       return
     }
@@ -64,12 +89,23 @@ export default function RegisterPage() {
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
       <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-8">
         <div className="w-full max-w-md bg-gray-900 rounded-2xl p-8 shadow-xl">
-          {!ticket ? (
+          {isFull ? (
+            <div className="flex flex-col items-center gap-4 text-center py-8">
+              <div className="text-5xl">🎟️</div>
+              <h1 className="text-xl font-bold">Registration Full</h1>
+              <p className="text-gray-400 text-sm">
+                All {1000} tickets have been claimed.
+              </p>
+            </div>
+          ):!ticket ? (
             <div className="flex flex-col gap-4">
-              <div className="text-center mb-2">
-                <h1 className="text-2xl font-bold">Get Your Ticket</h1>
-                <p className="text-gray-400 text-sm mt-1">National Sports Day & After-Party</p>
-              </div>
+            <div className="text-center mb-2">
+              <h1 className="text-2xl font-bold">Get Your Ticket</h1>
+              <p className="text-gray-400 text-sm mt-1">National Sports Day & After-Party</p>
+              {ticketCount !== null && (
+                <p className="text-gray-500 text-xs mt-2">{ticketCount} / 1000 registered</p>
+              )}
+            </div>
 
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Full Name *</label>
