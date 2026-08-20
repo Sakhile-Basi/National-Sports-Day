@@ -40,7 +40,7 @@ export default function RegisterPage() {
       .then(res => res.json())
       .then(data => {
         setTicketCount(data.count)
-        if (data.count >= 1000) setIsFull(true)
+        if (data.count >= 2000) setIsFull(true) 
       })
       .catch(() => {})
   }, [])
@@ -94,7 +94,7 @@ export default function RegisterPage() {
               <div className="text-5xl">🎟️</div>
               <h1 className="text-xl font-bold">Registration Full</h1>
               <p className="text-gray-400 text-sm">
-                All {1000} tickets have been claimed.
+                All {2000} tickets have been claimed.
               </p>
             </div>
           ):!ticket ? (
@@ -103,7 +103,7 @@ export default function RegisterPage() {
               <h1 className="text-2xl font-bold">Get Your Ticket</h1>
               <p className="text-gray-400 text-sm mt-1">National Sports Day & After-Party</p>
               {ticketCount !== null && (
-                <p className="text-gray-500 text-xs mt-2">{ticketCount} / 1000 registered</p>
+                <p className="text-gray-500 text-xs mt-2">{ticketCount} / 2000 registered</p>
               )}
             </div>
 
