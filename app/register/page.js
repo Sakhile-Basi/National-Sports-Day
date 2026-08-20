@@ -40,7 +40,7 @@ export default function RegisterPage() {
       .then(res => res.json())
       .then(data => {
         setTicketCount(data.count)
-        if (data.count >= 2000) setIsFull(true) 
+        if (data.count >= 1250) setIsFull(true) 
       })
       .catch(() => {})
   }, [])
@@ -94,7 +94,7 @@ export default function RegisterPage() {
               <div className="text-5xl">🎟️</div>
               <h1 className="text-xl font-bold">Registration Full</h1>
               <p className="text-gray-400 text-sm">
-                All {2000} tickets have been claimed.
+                All {1250} tickets have been claimed.
               </p>
             </div>
           ):!ticket ? (
